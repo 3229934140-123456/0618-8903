@@ -167,6 +167,14 @@ export const FlashSaleStockRepository = {
       .reduce((sum, r) => sum + r.quantity, 0);
   },
 
+  getRecordsByPromotion(promotionId: string, limit: number = 50): UserFlashPurchaseRecord[] {
+    const records = db.userFlashPurchases as unknown as UserFlashPurchaseRecord[];
+    return records
+      .filter(r => r.promotionId === promotionId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
+  },
+
   recordUserPurchase(userId: string, promotionId: string, quantity: number): void {
     const records = db.userFlashPurchases as unknown as UserFlashPurchaseRecord[];
     const existing = records.find(r => r.userId === userId && r.promotionId === promotionId);
@@ -206,6 +214,17 @@ export const OrderRepository = {
 
   findAll(limit: number = 100): Order[] {
     return [...db.orders]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit)
+      .map(rowToOrder);
+  },
+
+  findByPromotion(promotionId: string, limit: number = 50): Order[] {
+    return db.orders
+      .filter(o =>
+        o.status !== 'CANCELLED' &&
+        o.appliedPromotions.some(ap => ap.promotionId === promotionId)
+      )
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, limit)
       .map(rowToOrder);

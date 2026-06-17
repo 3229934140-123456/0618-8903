@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { PromotionRepository, ProductRepository, FlashSaleStockRepository, OrderRepository } from './repositories';
 import { calculateCart } from './promotion-engine';
 import { flashSaleQueue } from './flash-sale-queue';
-import { Promotion, PromotionType, PromotionStatus, CartItem, FlashSaleConfig } from './types';
+import { Promotion, PromotionType, PromotionStatus, CartItem, FlashSaleConfig, FlashSaleStock, Product } from './types';
 
 export const router = Router();
 
@@ -49,6 +49,37 @@ router.get('/promotions/:id', (req: Request, res: Response) => {
   }
 
   res.json({ ...promotion, flashSaleStock: stock });
+});
+
+router.get('/promotions/:id/detail', (req: Request, res: Response) => {
+  const promotion = PromotionRepository.findById(req.params.id);
+  if (!promotion) return res.status(404).json({ error: '活动不存在' });
+
+  let applicableProducts: Product[] = [];
+  if (promotion.scope.type === 'ALL') {
+    applicableProducts = ProductRepository.findAll();
+  } else if (promotion.scope.type === 'CATEGORY' && promotion.scope.categoryIds) {
+    const allProducts = ProductRepository.findAll();
+    applicableProducts = allProducts.filter(p => promotion.scope.categoryIds!.includes(p.categoryId));
+  } else if (promotion.scope.type === 'PRODUCT' && promotion.scope.productIds) {
+    applicableProducts = ProductRepository.findByIds(promotion.scope.productIds);
+  }
+
+  let stock: FlashSaleStock | null = null;
+  let purchaseRecords: any[] = [];
+  if (promotion.type === PromotionType.FLASH_SALE) {
+    stock = FlashSaleStockRepository.findById(promotion.id);
+    purchaseRecords = FlashSaleStockRepository.getRecordsByPromotion(promotion.id, 50);
+  }
+
+  const relatedOrders = OrderRepository.findByPromotion(promotion.id, 50);
+
+  res.json({
+    promotion: { ...promotion, flashSaleStock: stock },
+    applicableProducts,
+    relatedOrders,
+    purchaseRecords
+  });
 });
 
 router.post('/promotions', (req: Request, res: Response) => {

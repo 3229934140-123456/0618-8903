@@ -24,6 +24,12 @@ export const promotionApi = {
   list: () => api.get<Promotion[]>('/promotions').then(r => r.data),
   listActive: () => api.get<Promotion[]>('/promotions/active').then(r => r.data),
   get: (id: string) => api.get<Promotion>(`/promotions/${id}`).then(r => r.data),
+  getDetail: (id: string) => api.get<{
+    promotion: Promotion;
+    applicableProducts: Product[];
+    relatedOrders: Order[];
+    purchaseRecords: Array<{ id: number; userId: string; promotionId: string; quantity: number; createdAt: string }>;
+  }>(`/promotions/${id}/detail`).then(r => r.data),
   create: (data: Omit<Promotion, 'id' | 'createdAt' | 'updatedAt'>) =>
     api.post<Promotion>('/promotions', data).then(r => r.data),
   update: (id: string, data: Partial<Promotion>) =>

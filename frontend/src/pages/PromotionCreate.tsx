@@ -95,9 +95,19 @@ export default function PromotionCreate() {
         return;
       }
 
-      if (values.type === 'FLASH_SALE' && (!values.productIds || values.productIds.length !== 1)) {
-        message.error('限时秒杀活动必须选择且仅选择一个商品');
-        return;
+      let productIds = values.productIds;
+      if (values.type === 'FLASH_SALE') {
+        if (!productIds) {
+          message.error('限时秒杀活动必须选择且仅选择一个商品');
+          return;
+        }
+        if (!Array.isArray(productIds)) {
+          productIds = [productIds];
+        }
+        if (productIds.length !== 1) {
+          message.error('限时秒杀活动必须选择且仅选择一个商品');
+          return;
+        }
       }
 
       let config: any;
@@ -129,11 +139,11 @@ export default function PromotionCreate() {
       if (values.scopeType === 'CATEGORY') {
         scope.categoryIds = values.categoryIds;
       } else if (values.scopeType === 'PRODUCT') {
-        scope.productIds = values.productIds;
+        scope.productIds = productIds;
       }
 
       if (values.type === 'FLASH_SALE') {
-        const product = products.find(p => p.id === values.productIds?.[0]);
+        const product = products.find(p => p.id === productIds[0]);
         if (product && values.flashSalePrice >= product.price) {
           message.error('秒杀价格必须低于商品原价');
           return;
@@ -175,8 +185,16 @@ export default function PromotionCreate() {
         } else if (form.getFieldValue('scopeType') === 'PRODUCT') {
           await form.validateFields(['productIds']);
           if (form.getFieldValue('type') === 'FLASH_SALE') {
-            const pids = form.getFieldValue('productIds');
-            if (!pids || pids.length !== 1) {
+            let pids = form.getFieldValue('productIds');
+            if (!pids) {
+              message.error('限时秒杀活动必须选择且仅选择一个商品');
+              return;
+            }
+            if (!Array.isArray(pids)) {
+              pids = [pids];
+              form.setFieldValue('productIds', pids);
+            }
+            if (pids.length !== 1) {
               message.error('限时秒杀活动必须选择且仅选择一个商品');
               return;
             }
