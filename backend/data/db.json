@@ -1,0 +1,194 @@
+{
+  "products": [
+    {
+      "name": "智能手机 Pro",
+      "categoryId": "cat-electronics",
+      "categoryName": "电子产品",
+      "price": 3999,
+      "stock": 500,
+      "id": "5937b0e3-b5fd-4a3a-ab18-af7aac42cb89"
+    },
+    {
+      "name": "无线蓝牙耳机",
+      "categoryId": "cat-electronics",
+      "categoryName": "电子产品",
+      "price": 599,
+      "stock": 1000,
+      "id": "55f3f213-c097-4b7d-bb7e-ed7637ea2834"
+    },
+    {
+      "name": "智能手表",
+      "categoryId": "cat-electronics",
+      "categoryName": "电子产品",
+      "price": 1299,
+      "stock": 300,
+      "id": "d97c9ada-d02a-4e54-9f5c-3f0fa71a6283"
+    },
+    {
+      "name": "平板电脑",
+      "categoryId": "cat-electronics",
+      "categoryName": "电子产品",
+      "price": 2499,
+      "stock": 200,
+      "id": "5fb677e2-9ed9-4439-b734-8f80c0eab631"
+    },
+    {
+      "name": "男士商务衬衫",
+      "categoryId": "cat-clothing",
+      "categoryName": "服装服饰",
+      "price": 299,
+      "stock": 800,
+      "id": "73ea467b-14d2-41c4-bf60-5396195a8093"
+    },
+    {
+      "name": "女士连衣裙",
+      "categoryId": "cat-clothing",
+      "categoryName": "服装服饰",
+      "price": 459,
+      "stock": 600,
+      "id": "1297a3c3-b0ac-48ef-ab78-7736d6649e3a"
+    },
+    {
+      "name": "运动休闲鞋",
+      "categoryId": "cat-clothing",
+      "categoryName": "服装服饰",
+      "price": 389,
+      "stock": 900,
+      "id": "cf21b7ea-f97e-4659-b740-4fe86a5f16d6"
+    },
+    {
+      "name": "有机坚果礼盒",
+      "categoryId": "cat-food",
+      "categoryName": "食品饮料",
+      "price": 168,
+      "stock": 400,
+      "id": "5d063301-6463-4942-8717-768403a3ca83"
+    },
+    {
+      "name": "精品茶叶套装",
+      "categoryId": "cat-food",
+      "categoryName": "食品饮料",
+      "price": 258,
+      "stock": 350,
+      "id": "8222bea4-2637-4813-9dae-ef7c90d8f6d2"
+    },
+    {
+      "name": "畅销小说合集",
+      "categoryId": "cat-books",
+      "categoryName": "图书音像",
+      "price": 128,
+      "stock": 700,
+      "id": "39290841-4ea8-40bb-a08f-904e2511408d"
+    },
+    {
+      "name": "技术编程书籍",
+      "categoryId": "cat-books",
+      "categoryName": "图书音像",
+      "price": 99,
+      "stock": 600,
+      "id": "c792a606-680b-4d2f-bd90-cfdaac16af52"
+    }
+  ],
+  "promotions": [
+    {
+      "name": "满200减30",
+      "type": "FULL_REDUCTION",
+      "status": "ONLINE",
+      "scope": {
+        "type": "ALL"
+      },
+      "config": {
+        "threshold": 200,
+        "reduction": 30
+      },
+      "priority": 10,
+      "conflictStrategy": "STACK",
+      "startTime": "2026-06-10T20:40:29.349Z",
+      "endTime": "2026-07-17T20:40:29.349Z",
+      "id": "0a738bd9-f6d4-4acb-ba95-e6d87eefeb31",
+      "createdAt": "2026-06-17T20:40:29.350Z",
+      "updatedAt": "2026-06-17T20:40:29.350Z"
+    },
+    {
+      "name": "电子产品9折",
+      "type": "DISCOUNT",
+      "status": "ONLINE",
+      "scope": {
+        "type": "CATEGORY",
+        "categoryIds": [
+          "cat-electronics"
+        ]
+      },
+      "config": {
+        "rate": 0.9
+      },
+      "priority": 20,
+      "conflictStrategy": "STACK",
+      "startTime": "2026-06-10T20:40:29.349Z",
+      "endTime": "2026-06-24T20:40:29.349Z",
+      "id": "48565524-ef1e-49bd-b2de-b53a146f9aa0",
+      "createdAt": "2026-06-17T20:40:29.350Z",
+      "updatedAt": "2026-06-17T20:40:29.350Z"
+    },
+    {
+      "name": "买手机送耳机",
+      "type": "BUY_GIFT",
+      "status": "ONLINE",
+      "scope": {
+        "type": "PRODUCT",
+        "productIds": [
+          "5937b0e3-b5fd-4a3a-ab18-af7aac42cb89"
+        ]
+      },
+      "config": {
+        "buyProductId": "5937b0e3-b5fd-4a3a-ab18-af7aac42cb89",
+        "buyQuantity": 1,
+        "giftProductId": "55f3f213-c097-4b7d-bb7e-ed7637ea2834",
+        "giftQuantity": 1
+      },
+      "priority": 30,
+      "conflictStrategy": "EXCLUSIVE",
+      "mutuallyExclusiveWith": [],
+      "startTime": "2026-06-10T20:40:29.349Z",
+      "endTime": "2026-07-17T20:40:29.349Z",
+      "id": "7e3b381c-0b94-4cc4-b82f-7b018992e15b",
+      "createdAt": "2026-06-17T20:40:29.351Z",
+      "updatedAt": "2026-06-17T20:40:29.351Z"
+    },
+    {
+      "name": "智能手表限时秒杀",
+      "type": "FLASH_SALE",
+      "status": "ONLINE",
+      "scope": {
+        "type": "PRODUCT",
+        "productIds": [
+          "d97c9ada-d02a-4e54-9f5c-3f0fa71a6283"
+        ]
+      },
+      "config": {
+        "salePrice": 899,
+        "stock": 50,
+        "perUserLimit": 1
+      },
+      "priority": 100,
+      "conflictStrategy": "EXCLUSIVE",
+      "mutuallyExclusiveWith": [],
+      "startTime": "2026-06-10T20:40:29.349Z",
+      "endTime": "2026-06-24T20:40:29.349Z",
+      "id": "a370fa19-0988-40a3-9f9b-9d176c06680d",
+      "createdAt": "2026-06-17T20:40:29.351Z",
+      "updatedAt": "2026-06-17T20:40:29.351Z"
+    }
+  ],
+  "flashSaleStocks": [
+    {
+      "promotionId": "a370fa19-0988-40a3-9f9b-9d176c06680d",
+      "productId": "d97c9ada-d02a-4e54-9f5c-3f0fa71a6283",
+      "totalStock": 50,
+      "availableStock": 50,
+      "soldCount": 0
+    }
+  ],
+  "orders": [],
+  "userFlashPurchases": []
+}
