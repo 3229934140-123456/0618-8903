@@ -153,7 +153,7 @@ export default function PromotionCreate() {
       await promotionApi.create({
         name: values.name,
         type: values.type,
-        status: PromotionStatus.DRAFT,
+        status: values.type === 'FLASH_SALE' ? PromotionStatus.ONLINE : PromotionStatus.DRAFT,
         scope,
         config,
         priority: values.priority,

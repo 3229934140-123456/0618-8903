@@ -194,7 +194,9 @@ export default function FlashSaleDemo() {
     await Promise.all(requests);
 
     const durationMs = Date.now() - startTime;
-    const finalStockInfo = stocks[selectedPromoId];
+    
+    const finalStockInfo = await flashSaleApi.getStock(selectedPromoId);
+    loadData();
 
     setPressureResult({
       success,

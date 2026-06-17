@@ -259,21 +259,24 @@ export function calculateCart(
 
   const originalTotal = calculateItemsTotal(itemsWithProduct);
 
-  const nonFlashPromotions = promotions.filter(p => p.type !== PromotionType.FLASH_SALE);
-
-  const candidates: SingleRuleResult[] = [];
-  for (const promotion of nonFlashPromotions) {
-    const result = evaluateSinglePromotion(promotion, itemsWithProduct);
-    if (result) {
-      candidates.push(result);
-    }
-  }
-
   const allFlashSalePromos = flashSalePromotions || promotions.filter(p => p.type === PromotionType.FLASH_SALE);
   const flashSaleProductIds = new Set<string>();
   for (const fp of allFlashSalePromos) {
     if (fp.scope.productIds) {
       fp.scope.productIds.forEach(id => flashSaleProductIds.add(id));
+    }
+  }
+
+  const normalItems = itemsWithProduct.filter(item => !flashSaleProductIds.has(item.productId));
+  const flashItems = itemsWithProduct.filter(item => flashSaleProductIds.has(item.productId));
+
+  const nonFlashPromotions = promotions.filter(p => p.type !== PromotionType.FLASH_SALE);
+
+  const candidates: SingleRuleResult[] = [];
+  for (const promotion of nonFlashPromotions) {
+    const result = evaluateSinglePromotion(promotion, normalItems);
+    if (result) {
+      candidates.push(result);
     }
   }
 
@@ -337,7 +340,8 @@ export function calculateCart(
   const finalTotal = Math.round((originalTotal - totalDiscount) * 100) / 100;
 
   const resultItems = itemsWithProduct.map(item => {
-    const itemDiscount = Math.round((itemDiscountMap[item.productId] || 0) * 100) / 100;
+    const isFlashSale = flashSaleProductIds.has(item.productId);
+    const itemDiscount = isFlashSale ? 0 : Math.round((itemDiscountMap[item.productId] || 0) * 100) / 100;
     const itemTotal = item.unitPrice * item.quantity;
     const finalPrice = Math.round((itemTotal - itemDiscount) * 100) / 100;
     return {
@@ -345,13 +349,11 @@ export function calculateCart(
       quantity: item.quantity,
       unitPrice: item.unitPrice,
       finalPrice,
-      appliedPromotions: itemPromoMap[item.productId] || []
+      appliedPromotions: isFlashSale ? [] : (itemPromoMap[item.productId] || [])
     };
   });
 
-  const flashSaleItems = itemsWithProduct
-    .filter(item => flashSaleProductIds.has(item.productId))
-    .map(item => item.productId);
+  const flashSaleItems = flashItems.map(item => item.productId);
 
   return {
     originalTotal,
