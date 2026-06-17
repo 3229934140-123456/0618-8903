@@ -17,16 +17,16 @@ import {
   Checkbox,
   Divider,
   Typography,
-  Cascader
+  Alert
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { promotionApi, productApi } from '../api';
+import { PromotionStatus } from '../types';
 import type {
   PromotionType,
   ScopeType,
   ConflictStrategy,
-  PromotionStatus,
   Product,
   FullReductionConfig,
   DiscountConfig,
@@ -89,6 +89,16 @@ export default function PromotionCreate() {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+
+      if (values.type === 'FLASH_SALE' && values.scopeType !== 'PRODUCT') {
+        message.error('限时秒杀活动必须选择指定商品（单个商品）');
+        return;
+      }
+
+      if (values.type === 'FLASH_SALE' && (!values.productIds || values.productIds.length !== 1)) {
+        message.error('限时秒杀活动必须选择且仅选择一个商品');
+        return;
+      }
 
       let config: any;
       switch (values.type) {
@@ -155,12 +165,22 @@ export default function PromotionCreate() {
     try {
       if (current === 0) {
         await form.validateFields(['name', 'type', 'timeRange']);
+        if (form.getFieldValue('type') === 'FLASH_SALE') {
+          form.setFieldValue('scopeType', 'PRODUCT');
+        }
       } else if (current === 1) {
         await form.validateFields(['scopeType']);
         if (form.getFieldValue('scopeType') === 'CATEGORY') {
           await form.validateFields(['categoryIds']);
         } else if (form.getFieldValue('scopeType') === 'PRODUCT') {
           await form.validateFields(['productIds']);
+          if (form.getFieldValue('type') === 'FLASH_SALE') {
+            const pids = form.getFieldValue('productIds');
+            if (!pids || pids.length !== 1) {
+              message.error('限时秒杀活动必须选择且仅选择一个商品');
+              return;
+            }
+          }
         }
       } else if (current === 2) {
         const type = form.getFieldValue('type');
@@ -225,14 +245,23 @@ export default function PromotionCreate() {
         label="适用范围"
         rules={[{ required: true, message: '请选择适用范围' }]}
       >
-        <Radio.Group>
-          <Radio.Button value="ALL">全部商品</Radio.Button>
-          <Radio.Button value="CATEGORY">指定分类</Radio.Button>
+        <Radio.Group disabled={promotionType === 'FLASH_SALE'}>
+          <Radio.Button value="ALL" disabled={promotionType === 'FLASH_SALE'}>全部商品</Radio.Button>
+          <Radio.Button value="CATEGORY" disabled={promotionType === 'FLASH_SALE'}>指定分类</Radio.Button>
           <Radio.Button value="PRODUCT">指定商品</Radio.Button>
         </Radio.Group>
       </Form.Item>
 
-      {scopeType === 'CATEGORY' && (
+      {promotionType === 'FLASH_SALE' && (
+        <Alert
+          type="warning"
+          showIcon
+          message="限时秒杀活动必须绑定单个商品，适用范围已锁定为「指定商品」"
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      {scopeType === 'CATEGORY' && promotionType !== 'FLASH_SALE' && (
         <Form.Item
           name="categoryIds"
           label="选择分类"
@@ -249,10 +278,11 @@ export default function PromotionCreate() {
           name="productIds"
           label="选择商品"
           rules={[{ required: true, message: '请选择商品' }]}
+          extra={promotionType === 'FLASH_SALE' ? '秒杀活动仅支持选择一个商品' : undefined}
         >
           <Select
-            mode="multiple"
-            placeholder="搜索并选择商品"
+            mode={promotionType === 'FLASH_SALE' ? undefined : 'multiple'}
+            placeholder={promotionType === 'FLASH_SALE' ? '请选择一个商品' : '搜索并选择商品'}
             showSearch
             optionFilterProp="label"
             style={{ width: '100%' }}
@@ -266,7 +296,7 @@ export default function PromotionCreate() {
       )}
 
       {promotionType === 'FLASH_SALE' && scopeType !== 'PRODUCT' && (
-        <div style={{ color: '#faad14' }}>提示：秒杀活动建议选择单个指定商品</div>
+        <div style={{ color: '#faad14' }}>提示：秒杀活动必须选择单个指定商品</div>
       )}
     </Form>
   );

@@ -24,10 +24,13 @@ import {
 import { statsApi } from '../api';
 import type { SalesStats, FlashSaleStock } from '../types';
 
-interface WsData {
-  sales: SalesStats;
-  flashSaleStocks: FlashSaleStock[];
-  timestamp: string;
+interface WsMessage {
+  type: string;
+  data: {
+    sales: SalesStats;
+    flashSaleStocks: FlashSaleStock[];
+    timestamp: string;
+  };
 }
 
 const COLORS = ['#1677ff', '#52c41a', '#faad14', '#eb2f96', '#722ed1', '#13c2c2'];
@@ -42,11 +45,11 @@ export default function Dashboard() {
 
     const ws = new WebSocket(`ws://${window.location.host}/ws`);
     ws.onmessage = (event) => {
-      const data: WsData = JSON.parse(event.data);
-      if (data.type === 'stats_update') {
-        setStats(data.data.sales);
-        setFlashSaleStocks(data.data.flashSaleStocks);
-        setLastUpdate(data.data.timestamp);
+      const msg: WsMessage = JSON.parse(event.data);
+      if (msg.type === 'stats_update') {
+        setStats(msg.data.sales);
+        setFlashSaleStocks(msg.data.flashSaleStocks);
+        setLastUpdate(msg.data.timestamp);
       }
     };
 

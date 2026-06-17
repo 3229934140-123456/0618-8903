@@ -185,10 +185,47 @@
       "promotionId": "a370fa19-0988-40a3-9f9b-9d176c06680d",
       "productId": "d97c9ada-d02a-4e54-9f5c-3f0fa71a6283",
       "totalStock": 50,
-      "availableStock": 50,
-      "soldCount": 0
+      "availableStock": 49,
+      "soldCount": 1
     }
   ],
-  "orders": [],
-  "userFlashPurchases": []
+  "orders": [
+    {
+      "userId": "test-user-001",
+      "items": [
+        {
+          "productId": "d97c9ada-d02a-4e54-9f5c-3f0fa71a6283",
+          "quantity": 1,
+          "unitPrice": 1299
+        }
+      ],
+      "giftItems": [],
+      "originalTotal": 1299,
+      "finalTotal": 899,
+      "totalDiscount": 400,
+      "appliedPromotions": [
+        {
+          "promotionId": "a370fa19-0988-40a3-9f9b-9d176c06680d",
+          "promotionName": "智能手表限时秒杀",
+          "promotionType": "FLASH_SALE",
+          "discountAmount": 400,
+          "appliedItems": [
+            "d97c9ada-d02a-4e54-9f5c-3f0fa71a6283"
+          ]
+        }
+      ],
+      "status": "PAID",
+      "id": "787652fb-f68a-415e-a131-8a4eac3c963a",
+      "createdAt": "2026-06-17T20:55:08.447Z"
+    }
+  ],
+  "userFlashPurchases": [
+    {
+      "id": 1,
+      "userId": "test-user-001",
+      "promotionId": "a370fa19-0988-40a3-9f9b-9d176c06680d",
+      "quantity": 1,
+      "createdAt": "2026-06-17T20:55:08.445Z"
+    }
+  ]
 }

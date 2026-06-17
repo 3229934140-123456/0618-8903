@@ -246,7 +246,8 @@ function pickBestPromotionSet(
 export function calculateCart(
   cartItems: CartItem[],
   products: Product[],
-  promotions: Promotion[]
+  promotions: Promotion[],
+  flashSalePromotions?: Promotion[]
 ): CalculationResult {
   const productMap = new Map<string, Product>();
   products.forEach(p => productMap.set(p.id, p));
@@ -258,11 +259,21 @@ export function calculateCart(
 
   const originalTotal = calculateItemsTotal(itemsWithProduct);
 
+  const nonFlashPromotions = promotions.filter(p => p.type !== PromotionType.FLASH_SALE);
+
   const candidates: SingleRuleResult[] = [];
-  for (const promotion of promotions) {
+  for (const promotion of nonFlashPromotions) {
     const result = evaluateSinglePromotion(promotion, itemsWithProduct);
     if (result) {
       candidates.push(result);
+    }
+  }
+
+  const allFlashSalePromos = flashSalePromotions || promotions.filter(p => p.type === PromotionType.FLASH_SALE);
+  const flashSaleProductIds = new Set<string>();
+  for (const fp of allFlashSalePromos) {
+    if (fp.scope.productIds) {
+      fp.scope.productIds.forEach(id => flashSaleProductIds.add(id));
     }
   }
 
@@ -338,12 +349,17 @@ export function calculateCart(
     };
   });
 
+  const flashSaleItems = itemsWithProduct
+    .filter(item => flashSaleProductIds.has(item.productId))
+    .map(item => item.productId);
+
   return {
     originalTotal,
     finalTotal,
     totalDiscount,
     appliedPromotions,
     giftItems,
-    items: resultItems
+    items: resultItems,
+    flashSaleItems
   };
 }

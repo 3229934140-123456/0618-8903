@@ -12,6 +12,7 @@ import {
   Statistic,
   Divider,
   Empty,
+  Alert,
   message
 } from 'antd';
 import { MinusOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -221,6 +222,22 @@ export default function CartCalculator() {
 
         {result && (
           <Card title="优惠计算结果" style={{ marginTop: 16 }}>
+            {result.warnings && result.warnings.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                {result.warnings.map((w, i) => (
+                  <Alert key={i} type="warning" showIcon message={w} style={{ marginBottom: 8 }} />
+                ))}
+              </div>
+            )}
+            {result.flashSaleItems && result.flashSaleItems.length > 0 && (
+              <Alert
+                type="info"
+                showIcon
+                message="购物车中包含秒杀商品"
+                description="这些商品不享受普通优惠，按常规价格计算。如需秒杀价请前往「秒杀演示」页面通过抢购流程购买。"
+                style={{ marginBottom: 16 }}
+              />
+            )}
             <Row gutter={16} style={{ marginBottom: 16 }}>
               <Col span={8}>
                 <Statistic title="原价合计" value={result.originalTotal} precision={2} prefix="¥" />

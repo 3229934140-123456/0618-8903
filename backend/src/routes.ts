@@ -59,22 +59,34 @@ router.post('/promotions', (req: Request, res: Response) => {
       return res.status(400).json({ error: '缺少必要参数' });
     }
 
+    if (body.type === PromotionType.FLASH_SALE) {
+      if (body.scope.type !== 'PRODUCT' || !body.scope.productIds || body.scope.productIds.length !== 1) {
+        return res.status(400).json({ error: '限时秒杀活动必须选择且仅选择一个商品' });
+      }
+      const config = body.config as FlashSaleConfig;
+      if (!config.salePrice || !config.stock || !config.perUserLimit) {
+        return res.status(400).json({ error: '秒杀活动必须填写秒杀价格、库存和限购数量' });
+      }
+    }
+
     const promotion = PromotionRepository.create(body);
 
     if (body.type === PromotionType.FLASH_SALE) {
       const config = body.config as FlashSaleConfig;
-      const productIds = body.scope.productIds;
-      if (productIds && productIds.length > 0) {
-        FlashSaleStockRepository.create({
-          promotionId: promotion.id,
-          productId: productIds[0],
-          totalStock: config.stock,
-          availableStock: config.stock
-        });
-      }
+      const productIds = body.scope.productIds!;
+      FlashSaleStockRepository.create({
+        promotionId: promotion.id,
+        productId: productIds[0],
+        totalStock: config.stock,
+        availableStock: config.stock
+      });
     }
 
-    res.status(201).json(promotion);
+    const stock = body.type === PromotionType.FLASH_SALE
+      ? FlashSaleStockRepository.findById(promotion.id)
+      : null;
+
+    res.status(201).json({ ...promotion, flashSaleStock: stock });
   } catch (error) {
     console.error('创建活动失败:', error);
     res.status(500).json({ error: '创建活动失败' });
@@ -127,7 +139,19 @@ router.post('/calculate', (req: Request, res: Response) => {
     const promotions = PromotionRepository.findActive(now);
 
     const result = calculateCart(items, products, promotions);
-    res.json(result);
+
+    const warnings: string[] = [];
+    if (result.flashSaleItems.length > 0) {
+      const flashProductNames = result.flashSaleItems.map(id => {
+        const p = products.find(pp => pp.id === id);
+        return p ? p.name : id;
+      });
+      warnings.push(
+        `购物车中包含秒杀商品【${flashProductNames.join('、')}】，这些商品不享受普通优惠，请通过秒杀抢购流程以秒杀价购买。当前按常规价格计算。`
+      );
+    }
+
+    res.json({ ...result, warnings });
   } catch (error) {
     console.error('计算失败:', error);
     res.status(500).json({ error: '计算失败' });
@@ -160,7 +184,18 @@ router.post('/orders', (req: Request, res: Response) => {
       status: 'PAID'
     });
 
-    res.status(201).json({ ...order, calculation: calcResult });
+    const warnings: string[] = [];
+    if (calcResult.flashSaleItems.length > 0) {
+      const flashProductNames = calcResult.flashSaleItems.map(id => {
+        const p = products.find(pp => pp.id === id);
+        return p ? p.name : id;
+      });
+      warnings.push(
+        `订单中包含秒杀商品【${flashProductNames.join('、')}】，这些商品按常规价格结算。如需秒杀价请通过秒杀抢购流程购买。`
+      );
+    }
+
+    res.status(201).json({ ...order, calculation: calcResult, warnings });
   } catch (error) {
     console.error('创建订单失败:', error);
     res.status(500).json({ error: '创建订单失败' });

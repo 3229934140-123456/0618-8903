@@ -179,7 +179,7 @@ export default function PromotionList() {
       title: '操作',
       key: 'action',
       width: 200,
-      fixed: 'right',
+      fixed: 'right' as const,
       render: (_: any, r: Promotion) => (
         <Space>
           {r.status !== 'ONLINE' && (

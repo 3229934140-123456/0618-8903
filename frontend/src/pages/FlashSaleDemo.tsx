@@ -2,8 +2,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { Card, List, Button, Input, Progress, Space, Tag, Alert, Divider, Statistic, Row, Col, message } from 'antd';
 import { ThunderboltOutlined } from '@ant-design/icons';
 import { promotionApi, flashSaleApi, productApi } from '../api';
-import type { Promotion, PromotionType, Product, FlashSaleStock } from '../types';
-import { FlashSaleConfig } from '../types';
+import { PromotionType } from '../types';
+import type { Promotion, Product, FlashSaleStock, FlashSaleConfig } from '../types';
 
 export default function FlashSaleDemo() {
   const [flashSales, setFlashSales] = useState<Promotion[]>([]);

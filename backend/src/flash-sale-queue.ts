@@ -178,7 +178,8 @@ class FlashSaleQueue {
         unitPrice: product.price,
         finalPrice: finalTotal,
         appliedPromotions: [promotion.id]
-      }]
+      }],
+      flashSaleItems: [product.id]
     };
 
     const order = OrderRepository.create({

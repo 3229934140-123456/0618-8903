@@ -104,6 +104,7 @@ export interface CalculationResult {
   appliedPromotions: AppliedPromotion[];
   giftItems: CartItem[];
   items: (CartItem & { productId: string; finalPrice: number; appliedPromotions: string[] })[];
+  flashSaleItems: string[];
 }
 
 export interface Order {
